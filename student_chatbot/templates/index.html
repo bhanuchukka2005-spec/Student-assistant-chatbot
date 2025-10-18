@@ -3,98 +3,311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Chatbot</title>
+<title>Student Assistant Chatbot</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: Arial, sans-serif; background: #f5f5f5; display:flex; justify-content:center; align-items:center; height:100vh; }
-.chat-container { width:400px; max-width:90%; background:#fff; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; overflow:hidden; }
-#chatbox { padding:10px; height:400px; overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; }
-.message { margin:5px 0; padding:8px 12px; border-radius:20px; max-width:80%; word-wrap:break-word; position:relative; }
-.user { background:#007bff; color:#fff; align-self:flex-end; }
-.bot { background:#e4e6eb; color:#000; align-self:flex-start; }
-.timestamp { font-size:10px; color:#555; margin-top:2px; text-align:right; }
-.input-area { display:flex; border-top:1px solid #ccc; }
-#userInput { flex-grow:1; padding:10px; border:none; outline:none; font-size:16px; }
-#sendBtn { padding:10px 15px; background:#007bff; color:#fff; border:none; cursor:pointer; font-size:16px; }
-#sendBtn:hover { background:#0056b3; }
-#quickReplies { padding:5px; display:flex; gap:5px; flex-wrap:wrap; }
-#quickReplies button { padding:5px 8px; border:none; background:#e4e6eb; border-radius:5px; cursor:pointer; }
-#quickReplies button:hover { background:#ccc; }
+  /* Chatbot container */
+  #chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    height: 520px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 9999;
+    background: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=380&q=80') no-repeat center/cover;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
 
-/* Typing animation */
-.typing-dot { display:inline-block; width:6px; height:6px; margin:0 2px; background-color:#555; border-radius:50%; animation:bounce 1s infinite; }
-.typing-dot:nth-child(2){animation-delay:0.2s;}
-.typing-dot:nth-child(3){animation-delay:0.4s;}
-@keyframes bounce {0%,80%,100%{transform:scale(0);} 40%{transform:scale(1);}}
+  /* Minimized chat icon */
+  #chatbot-minimized {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(to right, #ff512f, #dd2476);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10000;
+    color: white;
+    font-size: 28px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+    100% { transform: scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+  }
+
+  #chatbot-minimized:hover {
+    animation: bounce 0.6s ease infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.1); }
+  }
+
+  /* Header */
+  #chatbot-header {
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    padding: 12px;
+    text-align: center;
+    background: linear-gradient(90deg, #ffd700, #6a11cb);
+    cursor: default;
+    position: relative;
+  }
+
+  /* Close button */
+  #chatbot-close {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* Messages */
+  #chatbot-messages {
+    flex: 1;
+    background: transparent;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chatbot-message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    word-wrap: break-word;
+    opacity: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .chatbot-message:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  .chatbot-message.user { 
+    background: rgba(0,198,255,0.85);
+    align-self: flex-end; 
+    color: #fff; 
+  }
+  .chatbot-message.bot { 
+    background: rgba(255,255,255,0.85);
+    align-self: flex-start; 
+    color: #1f1f1f; 
+  }
+  .chatbot-message.bot.typing {
+    font-style: italic;
+    opacity: 0.7;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.7;}50%{opacity:1;} }
+
+  /* Quick Reply Buttons */
+  .quick-reply {
+    background: linear-gradient(to right, #ffafbd, #ffc3a0);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    margin: 3px 2px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.3s;
+  }
+  .quick-reply:hover { 
+    transform: scale(1.1); 
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+
+  /* Input */
+  #chatbot-input-container { display:flex; border-top:1px solid #ddd; background:#fff; }
+  #chatbot-input { flex:1; border:none; padding:12px; font-size:14px; border-bottom-left-radius:20px; }
+  #chatbot-send { 
+    border:none; 
+    padding:12px 18px; 
+    background:linear-gradient(to right,#00c6ff,#0072ff);
+    color:white; 
+    font-weight:bold; 
+    border-bottom-right-radius:20px; 
+    transition:0.3s; 
+  }
+  #chatbot-send:hover { 
+    background: linear-gradient(to right,#ffafbd,#ffc3a0); 
+  }
+  #chatbot-send:active { transform: scale(0.9); }
+
+  /* Emoji reaction */
+  .emoji {
+    position: absolute;
+    font-size: 20px;
+    opacity: 1;
+    transform: translateY(0);
+    animation: floatUp 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 10001;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-30px); opacity: 0; }
+  }
 </style>
 </head>
 <body>
 
-<div class="chat-container">
-    <div id="chatbox"></div>
-    <div id="quickReplies"></div>
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendQuery()">
-        <button id="sendBtn" onclick="sendQuery()">Send</button>
-    </div>
+<!-- Minimized chat icon -->
+<div id="chatbot-minimized">💬</div>
+
+<!-- Full chatbot container -->
+<div id="chatbot-container" style="display:none;">
+  <div id="chatbot-header">🎓 College Assistant 
+    <span id="chatbot-close">✖</span>
+  </div>
+  <div id="chatbot-messages"></div>
+  <div id="chatbot-input-container">
+    <input type="text" id="chatbot-input" placeholder="Ask anything..." />
+    <button id="chatbot-send">Send</button>
+  </div>
 </div>
 
 <script>
-let sessionId = Date.now();
+const chatbotContainer = document.getElementById('chatbot-container');
+const chatbotMinimized = document.getElementById('chatbot-minimized');
+const chatbotClose = document.getElementById('chatbot-close');
+const messagesContainer = document.getElementById('chatbot-messages');
+const inputField = document.getElementById('chatbot-input');
+const sendButton = document.getElementById('chatbot-send');
+const SESSION_ID = 'student_chat_session';
 
-function getTime() {
-    const now = new Date();
-    return now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+// Show full chat
+chatbotMinimized.onclick = () => {
+  chatbotMinimized.style.display = 'none';
+  chatbotContainer.style.display = 'flex';
+};
+
+// Close/minimize chat
+chatbotClose.onclick = () => {
+  chatbotContainer.style.display = 'none';
+  chatbotMinimized.style.display = 'flex';
+};
+
+// Optional: double-click header to minimize
+document.getElementById('chatbot-header').ondblclick = () => {
+  chatbotContainer.style.display = 'none';
+  chatbotMinimized.style.display = 'flex';
+};
+
+// Add messages
+function addMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.classList.add('chatbot-message', sender);
+  const msgText = document.createElement('span');
+  msgText.textContent = text;
+  msg.appendChild(msgText);
+  const timestamp = document.createElement('div');
+  timestamp.style.fontSize = '10px';
+  timestamp.style.color = '#555';
+  timestamp.style.marginTop = '4px';
+  timestamp.style.textAlign = sender === 'user' ? 'right' : 'left';
+  const now = new Date();
+  timestamp.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  msg.appendChild(timestamp);
+  messagesContainer.appendChild(msg);
+  let opacity = 0;
+  const fadeInterval = setInterval(() => {
+      opacity += 0.1;
+      if(opacity >= 1){ opacity = 1; clearInterval(fadeInterval); }
+      msg.style.opacity = opacity;
+  }, 30);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-function updateQuickReplies(buttons){
-    const qr = document.getElementById('quickReplies');
-    qr.innerHTML = "";
-    buttons.forEach(b=>{
-        const btn = document.createElement('button');
-        btn.innerText = b;
-        btn.onclick = ()=>{ document.getElementById('userInput').value = b; sendQuery(); };
-        qr.appendChild(btn);
+// Quick reply
+function quickReply(text) { inputField.value = text; sendMessage(); }
+
+// Send message
+async function sendMessage() {
+  const query = inputField.value.trim();
+  if(!query) return;
+  const emoji = document.createElement('div');
+  emoji.classList.add('emoji');
+  emoji.textContent = '✨';
+  const rect = inputField.getBoundingClientRect();
+  emoji.style.left = rect.left + rect.width/2 + 'px';
+  emoji.style.top = rect.top - 10 + 'px';
+  document.body.appendChild(emoji);
+  setTimeout(()=>document.body.removeChild(emoji), 1000);
+  addMessage(query, 'user');
+  inputField.value = '';
+  const typingIndicator = document.createElement('div');
+  typingIndicator.classList.add('chatbot-message','bot','typing');
+  typingIndicator.textContent = 'Bot is typing... ⏳';
+  messagesContainer.appendChild(typingIndicator);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  try {
+    const res = await fetch('/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({query:query, session_id:SESSION_ID})
     });
-}
-
-async function sendQuery(){
-    const inputEl = document.getElementById('userInput');
-    const query = inputEl.value.trim();
-    if(!query) return;
-
-    const chatbox = document.getElementById('chatbox');
-    chatbox.innerHTML += `<div class="message user">${query}<div class="timestamp">${getTime()}</div></div>`;
-    chatbox.scrollTop = chatbox.scrollHeight;
-    inputEl.value = '';
-
-    // Typing indicator
-    const typingEl = document.createElement('div');
-    typingEl.className = 'message bot';
-    typingEl.id = 'typing';
-    typingEl.innerHTML = 'Bot is typing <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-    chatbox.appendChild(typingEl);
-    chatbox.scrollTop = chatbox.scrollHeight;
-
-    try {
-        const res = await fetch('/chat',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({query: query, session_id: sessionId})
-        });
-        const data = await res.json();
-        typingEl.remove();
-
-        chatbox.innerHTML += `<div class="message bot">${data.answer}<div class="timestamp">${getTime()}</div></div>`;
-        chatbox.scrollTop = chatbox.scrollHeight;
-
-        // Update dynamic quick-replies
-        updateQuickReplies(data.quick_replies);
-
-    } catch(err){
-        typingEl.remove();
-        chatbox.innerHTML += `<div class="message bot">Sorry, something went wrong.<div class="timestamp">${getTime()}</div></div>`;
+    const data = await res.json();
+    messagesContainer.removeChild(typingIndicator);
+    addMessage(data.answer,'bot');
+    if(data.quick_replies && data.quick_replies.length){
+      const qrDiv = document.createElement('div');
+      data.quick_replies.forEach(q=>{
+        const btn = document.createElement('button');
+        btn.textContent = q;
+        btn.classList.add('quick-reply');
+        btn.onclick = ()=>quickReply(q);
+        qrDiv.appendChild(btn);
+      });
+      messagesContainer.appendChild(qrDiv);
     }
+  } catch(err){
+    messagesContainer.removeChild(typingIndicator);
+    addMessage("Oops! Something went wrong.",'bot');
+    console.error(err);
+  }
 }
+
+sendButton.addEventListener('click',sendMessage);
+inputField.addEventListener('keypress',(e)=>{if(e.key==='Enter') sendMessage();});
+
+// Welcome message on load
+window.addEventListener('load', () => {
+  const welcomeText = "👋 Hello! I’m your College Assistant. I can help you with admissions, exams, placements, hostel info, and more!";
+  addMessage(welcomeText, 'bot');
+
+  const welcomeQuickReplies = ["Admissions 📚", "Exam Schedule 📝", "Placements 💼", "Hostel Info 🏠"];
+  const qrDiv = document.createElement('div');
+  welcomeQuickReplies.forEach(q => {
+    const btn = document.createElement('button');
+    btn.textContent = q;
+    btn.classList.add('quick-reply');
+    btn.onclick = () => quickReply(q);
+    qrDiv.appendChild(btn);
+  });
+  messagesContainer.appendChild(qrDiv);
+});
 </script>
 
 </body>
