@@ -1,0 +1,17 @@
+[
+  {
+    "intent": "admissions",
+    "questions": ["How do I apply?", "Admission process", "Eligibility criteria"],
+    "answer": "You can apply online through our college admission portal at www.collegeportal.edu/admissions."
+  },
+  {
+    "intent": "exams",
+    "questions": ["Exam schedule", "When are the exams?", "Exam timetable"],
+    "answer": "The exam timetable is available on the student portal under 'Exams'."
+  },
+  {
+    "intent": "placements",
+    "questions": ["Placement eligibility", "Placement process", "Companies visiting campus"],
+    "answer": "Placement info is available on the Training & Placement cell page. Eligibility is based on academic performance."
+  }
+]

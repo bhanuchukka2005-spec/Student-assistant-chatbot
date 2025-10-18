@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Chatbot</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f5f5f5; display:flex; justify-content:center; align-items:center; height:100vh; }
+.chat-container { width:400px; max-width:90%; background:#fff; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; overflow:hidden; }
+#chatbox { padding:10px; height:400px; overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; }
+.message { margin:5px 0; padding:8px 12px; border-radius:20px; max-width:80%; word-wrap:break-word; position:relative; }
+.user { background:#007bff; color:#fff; align-self:flex-end; }
+.bot { background:#e4e6eb; color:#000; align-self:flex-start; }
+.timestamp { font-size:10px; color:#555; margin-top:2px; text-align:right; }
+.input-area { display:flex; border-top:1px solid #ccc; }
+#userInput { flex-grow:1; padding:10px; border:none; outline:none; font-size:16px; }
+#sendBtn { padding:10px 15px; background:#007bff; color:#fff; border:none; cursor:pointer; font-size:16px; }
+#sendBtn:hover { background:#0056b3; }
+#quickReplies { padding:5px; display:flex; gap:5px; flex-wrap:wrap; }
+#quickReplies button { padding:5px 8px; border:none; background:#e4e6eb; border-radius:5px; cursor:pointer; }
+#quickReplies button:hover { background:#ccc; }
+
+/* Typing animation */
+.typing-dot { display:inline-block; width:6px; height:6px; margin:0 2px; background-color:#555; border-radius:50%; animation:bounce 1s infinite; }
+.typing-dot:nth-child(2){animation-delay:0.2s;}
+.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce {0%,80%,100%{transform:scale(0);} 40%{transform:scale(1);}}
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div id="chatbox"></div>
+    <div id="quickReplies"></div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendQuery()">
+        <button id="sendBtn" onclick="sendQuery()">Send</button>
+    </div>
+</div>
+
+<script>
+let sessionId = Date.now();
+
+function getTime() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+}
+
+function updateQuickReplies(buttons){
+    const qr = document.getElementById('quickReplies');
+    qr.innerHTML = "";
+    buttons.forEach(b=>{
+        const btn = document.createElement('button');
+        btn.innerText = b;
+        btn.onclick = ()=>{ document.getElementById('userInput').value = b; sendQuery(); };
+        qr.appendChild(btn);
+    });
+}
+
+async function sendQuery(){
+    const inputEl = document.getElementById('userInput');
+    const query = inputEl.value.trim();
+    if(!query) return;
+
+    const chatbox = document.getElementById('chatbox');
+    chatbox.innerHTML += `<div class="message user">${query}<div class="timestamp">${getTime()}</div></div>`;
+    chatbox.scrollTop = chatbox.scrollHeight;
+    inputEl.value = '';
+
+    // Typing indicator
+    const typingEl = document.createElement('div');
+    typingEl.className = 'message bot';
+    typingEl.id = 'typing';
+    typingEl.innerHTML = 'Bot is typing <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    chatbox.appendChild(typingEl);
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    try {
+        const res = await fetch('/chat',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({query: query, session_id: sessionId})
+        });
+        const data = await res.json();
+        typingEl.remove();
+
+        chatbox.innerHTML += `<div class="message bot">${data.answer}<div class="timestamp">${getTime()}</div></div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Update dynamic quick-replies
+        updateQuickReplies(data.quick_replies);
+
+    } catch(err){
+        typingEl.remove();
+        chatbox.innerHTML += `<div class="message bot">Sorry, something went wrong.<div class="timestamp">${getTime()}</div></div>`;
+    }
+}
+</script>
+
+</body>
+</html>
