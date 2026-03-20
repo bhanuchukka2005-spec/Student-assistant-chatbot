@@ -1,0 +1,22 @@
+[
+  {
+    "intent": "admissions",
+    "questions": ["how do i apply", "admission process", "eligibility criteria", "apply for admission"],
+    "answer": "You can apply online through our college admission portal at www.collegeportal.edu/admissions. The process includes filling out the form, uploading documents, and paying the application fee."
+  },
+  {
+    "intent": "exams",
+    "questions": ["exam schedule", "when are the exams", "exam timetable"],
+    "answer": "The exam timetable is available on the student portal under the 'Exams' section. Dates are typically published 4 weeks before the semester ends."
+  },
+  {
+    "intent": "placements",
+    "questions": ["placement eligibility", "placement process", "companies visiting campus"],
+    "answer": "Placement info is on the Training & Placement cell page. Eligibility is based on academic performance — usually a minimum CGPA of 6.0."
+  },
+  {
+    "intent": "hostel",
+    "questions": ["hostel facilities", "hostel info", "hostel fees", "mess menu"],
+    "answer": "Hostel applications open at the start of each academic year. Contact the hostel warden office for current fees and availability."
+  }
+]
