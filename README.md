@@ -3,7 +3,7 @@
 A conversational AI chatbot that helps college students get instant answers about admissions, exams, placements, hostel info, and more.
 
 ## 🚀 Live Demo
-[Click here to try it](coming soon)
+[Click here to try it](https://student-assistant-chatbot-2k4t.onrender.com)
 
 ## 🛠️ Tech Stack
 - **Backend:** Python, Flask
