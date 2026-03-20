@@ -1,66 +1,77 @@
-# Student-assistant-chatbot
-My first project
+# 🎓 Campus AI — Student Assistant Chatbot
 
-🎓 Student Assistance Chatbot
+A conversational AI chatbot that helps college students get instant answers about admissions, exams, placements, hostel info, and more.
 
-An AI-powered chatbot that provides instant access to college-related information such as admissions, exams, placements, academics, and hostel facilities through a conversational interface.
+## 🚀 Live Demo
+[Click here to try it](coming soon)
 
-💡 Problem Statement
+## 🛠️ Tech Stack
+- **Backend:** Python, Flask
+- **AI:** Groq API (Llama 3.3 70B)
+- **Frontend:** HTML, CSS, JavaScript
+- **Deployment:** Render
 
-Students often struggle to find accurate college information without visiting campus offices or navigating complex websites. This leads to time wastage and increased administrative workload.
+## ✨ Features
+- FAQ-first architecture for instant responses without hitting the AI API
+- Multi-turn conversation memory per session
+- Dynamic quick reply buttons based on context
+- Clean, responsive chat UI with typing indicators
+- Graceful fallback handling for API errors
 
-🚀 Solution
+## 🏗️ Architecture
+```
+User Message
+     ↓
+FAQ Match? → Yes → Return instant answer
+     ↓ No
+Groq AI API (Llama 3.3) with session history
+     ↓
+Response + Dynamic Quick Replies
+```
 
-The Student Assistance Chatbot uses Natural Language Processing (NLP) and the Google Gemini API to understand user queries and respond in real time through a simple, interactive chat interface embedded into a college website.
+## ⚙️ Run Locally
 
-✨ Key Features
+1. Clone the repo
+```bash
+git clone https://github.com/bhanuchukka2005-spec/Student-assistant-chatbot.git
+cd Student-assistant-chatbot
+```
 
-🤖 AI-powered conversational chatbot
+2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-📚 Supports queries on admissions, exams, placements & hostels
+3. Create a `.env` file
+```
+GROQ_API_KEY=your_groq_api_key_here
+```
 
-⚡ Instant responses using Gemini AI
+4. Run the app
+```bash
+python app.py
+```
 
-💬 Quick reply buttons & welcome message
+5. Open http://localhost:5000
 
-🧠 Context-aware conversations
-
-🎨 Clean, responsive, and eye-catching UI
-
-🔽 Minimize / maximize chatbot window
-
-🛠 Tech Stack
-
-Frontend: HTML, CSS, JavaScript
-
-Backend: Python, Flask
-
-AI / NLP: Google Gemini API
-
-🏗 How It Works
-
-User enters a query via chat interface
-
-Query is analyzed using NLP
-
-FAQ data is checked first
-
-If not found, Gemini AI generates a response
-
-Answer is displayed in real time
-
-📂 Project Structure
+## 📁 Project Structure
+```
 student_chatbot/
-├── app.py
-├── faq.json
-├── .env
-├── templates/
-│   └── index.html
+├── app.py           # Flask backend + API integration
+├── faq.json         # Local FAQ data
+├── requirements.txt
+├── Procfile         # For Render deployment
+├── .gitignore
+└── templates/
+    └── index.html   # Chat UI
+```
 
-🌍 Impact
+## 🔮 Planned Improvements
+- Vector search using ChromaDB for smarter FAQ matching
+- Persistent chat history with SQLite
+- Admin dashboard to view common student queries
+- RAG pipeline for college document Q&A
 
-Reduces manual student support workload
-
-Improves accessibility to information
-
-Enhances student experience through AI
+## 👤 Author
+**Bhanu** — B.Tech CSE Student at Presidency University
+[LinkedIn](https://www.linkedin.com/in/chukka-bhanu-prakash) · [GitHub](https://github.com/bhanuchukka2005-spec)
